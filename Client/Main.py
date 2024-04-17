@@ -2,7 +2,7 @@
 
 import sys
 
-class Client:
+if __name__ == "__main__":
     # クライアントの処理を開始
     def run(self):
         # ゲーム起動開始
@@ -18,7 +18,3 @@ class Client:
 
         # クライアントの処理を終了
         print("クライアントの処理を終了")
-
-if __name__ == "__main__":
-    # ゲームの処理を開始
-    sys.exit(0)
