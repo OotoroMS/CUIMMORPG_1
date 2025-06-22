@@ -1,20 +1,43 @@
-# クライアント側の全体処理
-
+import socket
+import threading
 import sys
 
-if __name__ == "__main__":
-    # クライアントの処理を開始
-    def run(self):
-        # ゲーム起動開始
-        print("---ゲーム起動中---")
-            # 起動処理
-        print("起動完了！")
+END_MARK = '\n'
 
-        # サーバへの接続
-        print("サーバへの接続")
+def recv_loop(sock):
+    try:
+        buf = b''
+        while True:
+            data = sock.recv(1024)
+            if not data:
+                print('\n[繧ｵ繝ｼ繝舌→縺ｮ謗･邯壹′蛻�譁ｭ縺輔ｌ縺ｾ縺励◆]')
+                break
+            buf += data
+            while END_MARK.encode() in buf:
+                line, buf = buf.split(END_MARK.encode(), 1)
+                print(line.decode('utf-8'))
+    except OSError:
+        pass
 
-        # クライアントの処理を実装
-        
+def main(host='127.0.0.1', port=5000):
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.connect((host, port))
+    thread = threading.Thread(target=recv_loop, args=(sock,), daemon=True)
+    thread.start()
+    try:
+        while True:
+            try:
+                line = input()
+            except EOFError:
+                break
+            sock.sendall((line + END_MARK).encode('utf-8'))
+    finally:
+        sock.close()
 
-        # クライアントの処理を終了
-        print("クライアントの処理を終了")
+if __name__ == '__main__':
+    import argparse
+    parser = argparse.ArgumentParser(description='Simple RPG Client')
+    parser.add_argument('--host', default='127.0.0.1')
+    parser.add_argument('--port', type=int, default=5000)
+    args = parser.parse_args()
+    main(args.host, args.port)
